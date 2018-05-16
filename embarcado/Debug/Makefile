@@ -2,7 +2,7 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-SHELL := cmd.exe
+
 RM := rm -rf
 
 USER_OBJS :=
@@ -131,6 +131,9 @@ C_SRCS +=  \
 ../src/ASF/thirdparty/freertos/freertos-7.3.0/source/queue.c \
 ../src/ASF/thirdparty/freertos/freertos-7.3.0/source/tasks.c \
 ../src/ASF/thirdparty/freertos/freertos-7.3.0/source/timers.c \
+../src/nfc.c \
+../src/pn532.c \
+../src/systick.c \
 ../src/wifi.c \
 ../src/ASF/common/components/wifi/winc1500/bsp/source/nm_bsp_same70.c \
 ../src/ASF/common/components/wifi/winc1500/bus_wrapper/source/nm_bus_wrapper_same70.c \
@@ -187,6 +190,9 @@ src/ASF/thirdparty/freertos/freertos-7.3.0/source/portable/memmang/heap_4.o \
 src/ASF/thirdparty/freertos/freertos-7.3.0/source/queue.o \
 src/ASF/thirdparty/freertos/freertos-7.3.0/source/tasks.o \
 src/ASF/thirdparty/freertos/freertos-7.3.0/source/timers.o \
+src/nfc.o \
+src/pn532.o \
+src/systick.o \
 src/wifi.o \
 src/ASF/common/components/wifi/winc1500/bsp/source/nm_bsp_same70.o \
 src/ASF/common/components/wifi/winc1500/bus_wrapper/source/nm_bus_wrapper_same70.o \
@@ -236,6 +242,9 @@ src/ASF/thirdparty/freertos/freertos-7.3.0/source/portable/memmang/heap_4.o \
 src/ASF/thirdparty/freertos/freertos-7.3.0/source/queue.o \
 src/ASF/thirdparty/freertos/freertos-7.3.0/source/tasks.o \
 src/ASF/thirdparty/freertos/freertos-7.3.0/source/timers.o \
+src/nfc.o \
+src/pn532.o \
+src/systick.o \
 src/wifi.o \
 src/ASF/common/components/wifi/winc1500/bsp/source/nm_bsp_same70.o \
 src/ASF/common/components/wifi/winc1500/bus_wrapper/source/nm_bus_wrapper_same70.o \
@@ -285,6 +294,9 @@ src/ASF/thirdparty/freertos/freertos-7.3.0/source/portable/memmang/heap_4.d \
 src/ASF/thirdparty/freertos/freertos-7.3.0/source/queue.d \
 src/ASF/thirdparty/freertos/freertos-7.3.0/source/tasks.d \
 src/ASF/thirdparty/freertos/freertos-7.3.0/source/timers.d \
+src/nfc.d \
+src/pn532.d \
+src/systick.d \
 src/wifi.d \
 src/ASF/common/components/wifi/winc1500/bsp/source/nm_bsp_same70.d \
 src/ASF/common/components/wifi/winc1500/bus_wrapper/source/nm_bus_wrapper_same70.d \
@@ -334,6 +346,9 @@ src/ASF/thirdparty/freertos/freertos-7.3.0/source/portable/memmang/heap_4.d \
 src/ASF/thirdparty/freertos/freertos-7.3.0/source/queue.d \
 src/ASF/thirdparty/freertos/freertos-7.3.0/source/tasks.d \
 src/ASF/thirdparty/freertos/freertos-7.3.0/source/timers.d \
+src/nfc.d \
+src/pn532.d \
+src/systick.d \
 src/wifi.d \
 src/ASF/common/components/wifi/winc1500/bsp/source/nm_bsp_same70.d \
 src/ASF/common/components/wifi/winc1500/bus_wrapper/source/nm_bus_wrapper_same70.d \
@@ -390,6 +405,12 @@ LINKER_SCRIPT_DEP+=  \
 
 
 # AVR32/GNU C Compiler
+
+
+
+
+
+
 
 
 

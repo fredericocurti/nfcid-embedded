@@ -818,6 +818,24 @@
     <Compile Include="src\ASF\thirdparty\freertos\freertos-7.3.0\source\timers.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\nfc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\nfc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\pn532.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\pn532.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\systick.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\systick.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\wifi.h">
       <SubType>compile</SubType>
     </Compile>

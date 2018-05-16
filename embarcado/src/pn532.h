@@ -24,6 +24,7 @@ uint8_t command;
 void usart_put_string(Usart *usart, char str[]);
 void DMSG_HEX(uint32_t val);
 uint32_t pn532_get_firmware_version(void);
+uint8_t pn532_setPassiveActivationRetries(uint8_t maxRetries);
 void pn532_begin();
 void pn532_wakeup();
 

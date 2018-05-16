@@ -77,8 +77,7 @@ void usart_log(char* name, char* log) {
 	//usart_enable_rx(USART1);
 //}
 
-int taskNfc (void)
-{
+int taskNfc (void) {
 	/* Insert system clock initialization code here (sysclk_init()). */
 	//board_init();
 	//sysclk_init();
@@ -88,7 +87,9 @@ int taskNfc (void)
 	pn532_config();
 	systick_config();
 	
-	usart_log("main", "Inicializando");
+	printf("[NFC] Nfc task init\n");
+	delay_s(2);
+	
 	pn532_begin();
 	pn532_wakeup();
 	//delay_ms(100);
@@ -104,15 +105,14 @@ int taskNfc (void)
 		printf("Falha em criar a fila\n");
 	}
 	
-	
 	uint32_t ver = pn532_get_firmware_version();
+	
 	DMSG_HEX(ver);
 	while(1) {
 		uint32_t val = 0;
 		usart_read(USART0, &val);
 		DMSG_HEX(val);
-		delay_s(1);
-		
+		vTaskDelay(1000);
 	}
 	
 	/* Insert application code here, after the board has been initialized. */

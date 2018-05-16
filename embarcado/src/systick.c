@@ -6,12 +6,10 @@
  */ 
 
 #include "systick.h"
-
 volatile unsigned long g_systimer = 0;
 
-void SysTick_Handler() {
-	g_systimer++;
-}
+//void SysTick_Handler() {
+//}
 
 void systick_config() {
 	SysTick_Config(sysclk_get_cpu_hz() / 1000); // 1 ms

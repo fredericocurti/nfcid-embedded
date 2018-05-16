@@ -2,6 +2,7 @@
 #include "main.h"
 #include "wifi.h"
 #include "nfc.h"
+#include "systick.h"
 #include "conf_board.h"
 #include <string.h>
 //#include "bsp/include/nm_bsp.h"
@@ -60,8 +61,8 @@ int validateId(char* id) {
 /**
  * \brief Handler for System Tick interrupt.
  */
-void SysTick_Handler(void)
-{
+void SysTick_Handler(void) {
+	g_systimer++;
 	xPortSysTickHandler();
 }
 #endif
@@ -142,6 +143,16 @@ static void taskMain(void *pvParameters) {
 	}
 }
 
+static void taskLed(void *pvParameters) {
+	UNUSED(pvParameters);
+		
+	for (;;) {
+		LED_Toggle(LED0);
+		printf("[LED] Rodando...\n");
+		vTaskDelay(5000);
+	}
+}
+
 
 /**
  * \brief Main application function.
@@ -187,6 +198,11 @@ int main(void) {
 	if (xTaskCreate(taskNfc, "NFC", TASK_MONITOR_STACK_SIZE, NULL,
 	TASK_LED_STACK_PRIORITY, NULL) != pdPASS) {
 		printf("Failed to create NFC task\r\n");
+	}
+	
+	if (xTaskCreate(taskLed, "LED", TASK_MONITOR_STACK_SIZE, NULL,
+	TASK_LED_STACK_PRIORITY, NULL) != pdPASS) {
+		printf("Failed to create LED task\r\n");
 	}
 	
 	vTaskStartScheduler();

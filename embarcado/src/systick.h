@@ -12,5 +12,7 @@
 #include <asf.h>
 unsigned long millis();
 void systick_config();
+volatile unsigned long g_systimer;
+
 
 #endif /* SYSTICK_H_ */

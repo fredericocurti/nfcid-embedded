@@ -114,8 +114,8 @@ void pn532_wakeup()
 		usart_read(USART0, &ret);
         DMSG_HEX(ret);
     }
-
 }
+
 
 int8_t pn532_write_command(const uint8_t *header, uint8_t hlen, const uint8_t *body, uint8_t blen)
 {
@@ -250,4 +250,92 @@ uint32_t pn532_get_firmware_version(void)
 	response |= pn532_packetbuffer[3];
 
 	return response;
+}
+
+uint8_t pn532_setPassiveActivationRetries(uint8_t maxRetries) {
+	uint8_t pb[64];
+	pb[0] = PN532_COMMAND_RFCONFIGURATION;
+	pb[1] = 5;
+	pb[2] = 0xFF;
+	pb[3] = 0x01;
+	pb[4] = maxRetries;
+	
+	/** dump serial buffer */
+	if(pn532_write_command(pb, 5, NULL, 0)) {
+		return 0x00;
+	}
+	
+	return (0 < pn532_read_response(pb, sizeof(pb), 50));
+}
+
+uint8_t pn532_SAMConfig(void) {
+	uint8_t pb[64];
+	pb[0] = PN532_COMMAND_SAMCONFIGURATION;
+	pb[1] = 0x01; // normal mode
+	pb[2] = 0x14; // timeout 50ms * 20 = 1 second
+	pb[3] = 0x01; // use IRQ pin!
+	
+	printf("[pn532] SAMConfig\n");
+	
+	if (pn532_write_command(pb, 4, NULL, 0)) {
+		return 0;
+	}
+	
+	return (0 < pn532_read_response(pb, sizeof(pb), 50));
+}
+
+uint8_t pn532_readPassiveTargetID(uint8_t cardBaudrate, uint8_t *uid, uint8_t *uidLength, uint16_t timeout, uint8_t inlist) {
+	uint8_t pb[64];
+	pb[0] = PN532_COMMAND_INLISTPASSIVETARGET;
+	pb[1] = 0x01; // max 1 cards at once
+	pb[2] = cardBaudrate;
+	
+	//printf("[pn532] SAMConfig\n");
+	
+	if (pn532_write_command(pb, 3, NULL, 0)) {
+		return 0x0; // command failed
+	}
+	
+	if ( pn532_read_response(pb, sizeof(pb), 50) < 0 ) {
+		return 0x0;
+	}
+	
+	// check some basic stuff
+    /* ISO14443A card response should be in the following format:
+
+      byte            Description
+      -------------   ------------------------------------------
+      b0              Tags Found
+      b1              Tag Number (only one used in this example)
+      b2..3           SENS_RES
+      b4              SEL_RES
+      b5              NFCID Length
+      b6..NFCIDLen    NFCID
+    */
+	
+	if (pb[0] != 1) {
+		return 0x0;
+	}
+	
+	uint16_t sens_res = pb[2];
+	sens_res <<= 8;
+	sens_res |= pb[3];
+	
+	printf("ATQA: 0x"); DMSG_HEX(sens_res);
+	printf("SAK: 0x"); DMSG_HEX(pb[4]);
+	DMSG("\n");	
+	
+	// card appears to be mifare classic
+	*uidLength = pb[5];
+	
+	for (uint8_t i = 0; i < pb[5]; i++) {
+		uid[i] = pb[6 + i];
+	}
+	
+	if (inlist) {
+		inListedTag = pb[1];
+	}
+	
+	return 1;
+
 }

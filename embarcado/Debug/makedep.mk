@@ -16,6 +16,12 @@ src\ASF\thirdparty\freertos\freertos-7.3.0\source\tasks.c
 
 src\ASF\thirdparty\freertos\freertos-7.3.0\source\timers.c
 
+src\nfc.c
+
+src\pn532.c
+
+src\systick.c
+
 src\wifi.c
 
 src\ASF\common\components\wifi\winc1500\bsp\source\nm_bsp_same70.c

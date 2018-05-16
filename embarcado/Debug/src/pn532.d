@@ -1,4 +1,4 @@
-src/main.d src/main.o: ../src/main.c ../src/asf.h \
+src/pn532.d src/pn532.o: ../src/pn532.c ../src/pn532.h ../src/asf.h \
  ../src/ASF/sam/utils/compiler.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\lib\gcc\arm-none-eabi\6.3.1\include\stddef.h \
  ../src/ASF/common/utils/parts.h \
@@ -187,21 +187,12 @@ src/main.d src/main.o: ../src/main.c ../src/asf.h \
  ../src/ASF/sam/drivers/uart/uart.h ../src/ASF/sam/drivers/usart/usart.h \
  ../src/config/conf_uart_serial.h ../src/ASF/sam/drivers/tc/tc.h \
  ../src/ASF/sam/drivers/twihs/twihs.h \
- ../src/ASF/sam/drivers/pio/pio_handler.h ../src/main.h \
- ../src/ASF/common/components/wifi/winc1500/driver/include/m2m_wifi.h \
- ../src/ASF/common/components/wifi/winc1500/common/include/nm_common.h \
- ../src/ASF/common/components/wifi/winc1500/bsp/include/nm_bsp.h \
- ../src/ASF/common/components/wifi/winc1500/common/include/nm_debug.h \
- ../src/ASF/common/components/wifi/winc1500/bsp/include/nm_bsp_internal.h \
- ../src/ASF/common/components/wifi/winc1500/bsp/include/nm_bsp_same70.h \
- ../src/config/conf_winc.h \
- ../src/ASF/common/components/wifi/winc1500/driver/include/m2m_types.h \
- ../src/ASF/common/components/wifi/winc1500/driver/source/nmdrv.h \
- ../src/wifi.h ../src/nfc.h ../src/systick.h ../src/asf.h \
- ../src/config/conf_board.h \
+ ../src/ASF/sam/drivers/pio/pio_handler.h ../src/systick.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\string.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\xlocale.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\sys\string.h
+
+../src/pn532.h:
 
 ../src/asf.h:
 
@@ -595,35 +586,7 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 
 ../src/ASF/sam/drivers/pio/pio_handler.h:
 
-../src/main.h:
-
-../src/ASF/common/components/wifi/winc1500/driver/include/m2m_wifi.h:
-
-../src/ASF/common/components/wifi/winc1500/common/include/nm_common.h:
-
-../src/ASF/common/components/wifi/winc1500/bsp/include/nm_bsp.h:
-
-../src/ASF/common/components/wifi/winc1500/common/include/nm_debug.h:
-
-../src/ASF/common/components/wifi/winc1500/bsp/include/nm_bsp_internal.h:
-
-../src/ASF/common/components/wifi/winc1500/bsp/include/nm_bsp_same70.h:
-
-../src/config/conf_winc.h:
-
-../src/ASF/common/components/wifi/winc1500/driver/include/m2m_types.h:
-
-../src/ASF/common/components/wifi/winc1500/driver/source/nmdrv.h:
-
-../src/wifi.h:
-
-../src/nfc.h:
-
 ../src/systick.h:
-
-../src/asf.h:
-
-../src/config/conf_board.h:
 
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\string.h:
 
