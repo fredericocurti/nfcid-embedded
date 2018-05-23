@@ -133,11 +133,11 @@ static void taskMain(void *pvParameters) {
 	
 	for (;;) {
 		printf("[Main] Main running...\n");
-		isValid = validateId(id); // FAZ O REQUEST E RETORNA SE O ID E VALIDO OU NAO
+		//isValid = validateId(id); // FAZ O REQUEST E RETORNA SE O ID E VALIDO OU NAO
 
-		isValid == 1
-			? printf("[Main] ID: %s is VALID\n", id)
-			: printf("[Main] ID: %s is INVALID\n", id);
+		//isValid == 1
+			//? printf("[Main] ID: %s is VALID\n", id)
+			//: printf("[Main] ID: %s is INVALID\n", id);
 			
 		vTaskDelay(10000);	
 	}
@@ -171,7 +171,7 @@ int main(void) {
 	configure_console();
 	printf(STRING_HEADER);
 	
-	delay_s(4);
+	delay_s(5);
 	
 	//wifiInit();
 	//wifiIsConnected = wifiInit();
@@ -185,10 +185,10 @@ int main(void) {
 		printf("Failed to create Monitor task\r\n");
 	}
 	
-	if (xTaskCreate(taskWifi, "Wifi", TASK_LED_STACK_SIZE, NULL,
-	TASK_LED_STACK_PRIORITY, NULL) != pdPASS) {
-		printf("Failed to create Wifi task\r\n");
-	}
+	//if (xTaskCreate(taskWifi, "Wifi", TASK_LED_STACK_SIZE, NULL,
+	//TASK_LED_STACK_PRIORITY, NULL) != pdPASS) {
+		//printf("Failed to create Wifi task\r\n");
+	//}
 
 	if (xTaskCreate(taskMain, "MAIN", TASK_MONITOR_STACK_SIZE, NULL,
 	TASK_LED_STACK_PRIORITY, NULL) != pdPASS) {

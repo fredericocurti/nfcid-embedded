@@ -1,5 +1,5 @@
-src/nfc.d src/nfc.o: ../src/nfc.c ../src/asf.h \
- ../src/ASF/sam/utils/compiler.h \
+src/llcp.d src/llcp.o: ../src/llcp.c ../src/llcp.h ../src/mac_link.h \
+ ../src/pn532.h ../src/asf.h ../src/ASF/sam/utils/compiler.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\lib\gcc\arm-none-eabi\6.3.1\include\stddef.h \
  ../src/ASF/common/utils/parts.h \
  ../src/ASF/sam/utils/preprocessor/preprocessor.h \
@@ -187,12 +187,13 @@ src/nfc.d src/nfc.o: ../src/nfc.c ../src/asf.h \
  ../src/ASF/sam/drivers/uart/uart.h ../src/ASF/sam/drivers/usart/usart.h \
  ../src/config/conf_uart_serial.h ../src/ASF/sam/drivers/tc/tc.h \
  ../src/ASF/sam/drivers/twihs/twihs.h \
- ../src/ASF/sam/drivers/pio/pio_handler.h \
- c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\string.h \
- c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\xlocale.h \
- c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\sys\string.h \
- ../src/systick.h ../src/snep.h ../src/llcp.h ../src/mac_link.h \
- ../src/pn532.h
+ ../src/ASF/sam/drivers/pio/pio_handler.h
+
+../src/llcp.h:
+
+../src/mac_link.h:
+
+../src/pn532.h:
 
 ../src/asf.h:
 
@@ -585,19 +586,3 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 ../src/ASF/sam/drivers/twihs/twihs.h:
 
 ../src/ASF/sam/drivers/pio/pio_handler.h:
-
-c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\string.h:
-
-c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\xlocale.h:
-
-c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\sys\string.h:
-
-../src/systick.h:
-
-../src/snep.h:
-
-../src/llcp.h:
-
-../src/mac_link.h:
-
-../src/pn532.h:

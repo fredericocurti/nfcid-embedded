@@ -818,6 +818,18 @@
     <Compile Include="src\ASF\thirdparty\freertos\freertos-7.3.0\source\timers.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\llcp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\llcp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\mac_link.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\mac_link.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\nfc.c">
       <SubType>compile</SubType>
     </Compile>
@@ -828,6 +840,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\pn532.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\snep.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\snep.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\systick.c">

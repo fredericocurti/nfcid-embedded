@@ -1,8 +1,7 @@
 #include "snep.h"
 #include "pn532.h"
 
-
-int16_t snep_read(uint8_t *buf, uint8_t len, uint16_t timeout = 0){
+int16_t snep_read(uint8_t *buf, uint8_t len, uint16_t timeout){
  if (0 >= llcp_activate(timeout)) {
 		DMSG("failed to activate PN532 as a target\n");
 		return -1;
@@ -17,7 +16,6 @@ int16_t snep_read(uint8_t *buf, uint8_t len, uint16_t timeout = 0){
 	if (6 > status) {
 		return -3;
 	}
-
 
 	// check SNEP version
 	if (SNEP_DEFAULT_VERSION != buf[0]) {
@@ -53,7 +51,7 @@ int16_t snep_read(uint8_t *buf, uint8_t len, uint16_t timeout = 0){
 	headerBuf[3] = 0;
 	headerBuf[4] = 0;
 	headerBuf[5] = 0;
-	llcp_write(headerBuf, 6);
-
+	llcp_write(headerBuf, 6, 0, 0);
+	
 	return length;
 }

@@ -26,15 +26,18 @@ inline uint8_t getDSAP(const uint8_t *buf)
     return buf[0] >> 2;
 }
 
-int8_t LLCP_activate(uint16_t timeout)
-{
+void llcp_init() {
+	headerBuf = link_getHeaderBuffer(&headerBufLen);
+	ns = 0;
+	nr = 0;
+};
+
+int8_t llcp_activate(uint16_t timeout) {
     return link_activateAsTarget(timeout);
 }
 
-int8_t LLCP_waitForConnection(uint16_t timeout)
-{
+int8_t llcp_waitForConnection(uint16_t timeout) {
     uint8_t type;
-
     mode = 1;
     ns = 0;
     nr = 0;
@@ -50,7 +53,7 @@ int8_t LLCP_waitForConnection(uint16_t timeout)
         if (PDU_CONNECT == type) {
             break;
         } else if (PDU_SYMM == type) {
-            if (!link_write(SYMM_PDU, sizeof(SYMM_PDU))) {
+            if (!link_write(SYMM_PDU, sizeof(SYMM_PDU), 0, 0)) {
                 return -2;
             }
         } else {
@@ -65,15 +68,14 @@ int8_t LLCP_waitForConnection(uint16_t timeout)
     dsap = getSSAP(headerBuf);
     headerBuf[0] = (dsap << 2) + ((PDU_CC >> 2) & 0x3);
     headerBuf[1] = ((PDU_CC & 0x3) << 6) + ssap;
-    if (!link_write(headerBuf, 2)) {
+    if (!link_write(headerBuf, 2, 0, 0)) {
         return -2;
     }
 
     return 1;
 }
 
-bool LLCP_write(const uint8_t *header, uint8_t hlen, const uint8_t *body, uint8_t blen)
-{
+bool llcp_write(const uint8_t *header, uint8_t hlen, const uint8_t *body, uint8_t blen) {
     uint8_t type;
     uint8_t buf[3];
 
@@ -113,7 +115,7 @@ bool LLCP_write(const uint8_t *header, uint8_t hlen, const uint8_t *body, uint8_
         if (PDU_RR == type) {
             break;
         } else if (PDU_SYMM == type) {
-            if (!link_write(SYMM_PDU, sizeof(SYMM_PDU))) {
+            if (!link_write(SYMM_PDU, sizeof(SYMM_PDU), 0, 0)) {
                 return false;
             }
         } else {
@@ -121,14 +123,14 @@ bool LLCP_write(const uint8_t *header, uint8_t hlen, const uint8_t *body, uint8_
         }
     } while (1);
 
-    if (!link_write(SYMM_PDU, sizeof(SYMM_PDU))) {
+    if (!link_write(SYMM_PDU, sizeof(SYMM_PDU), 0, 0)) {
         return false;
     }
 
     return true;
 }
 
-int16_t LLCP_read(uint8_t *buf, uint8_t length)
+int16_t llcp_read(uint8_t *buf, uint8_t length)
 {
     uint8_t type;
     uint16_t status;
@@ -144,7 +146,7 @@ int16_t LLCP_read(uint8_t *buf, uint8_t length)
         if (PDU_I == type) {
             break;
         } else if (PDU_SYMM == type) {
-            if (!link_write(SYMM_PDU, sizeof(SYMM_PDU))) {
+            if (!link_write(SYMM_PDU, sizeof(SYMM_PDU), 0, 0)) {
                 return -2;
             }
         } else {
@@ -160,7 +162,7 @@ int16_t LLCP_read(uint8_t *buf, uint8_t length)
     headerBuf[0] = (dsap << 2) + (PDU_RR >> 2);
     headerBuf[1] = ((PDU_RR & 0x3) << 6) + ssap;
     headerBuf[2] = (buf[2] >> 4) + 1;
-    if (!link_write(headerBuf, 3)) {
+    if (!link_write(headerBuf, 3, 0, 0)) {
         return -2;
     }
 

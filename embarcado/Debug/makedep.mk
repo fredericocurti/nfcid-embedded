@@ -16,9 +16,15 @@ src\ASF\thirdparty\freertos\freertos-7.3.0\source\tasks.c
 
 src\ASF\thirdparty\freertos\freertos-7.3.0\source\timers.c
 
+src\llcp.c
+
+src\mac_link.c
+
 src\nfc.c
 
 src\pn532.c
+
+src\snep.c
 
 src\systick.c
 
