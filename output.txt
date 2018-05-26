@@ -1,0 +1,107 @@
+-------Peer to Peer--------
+
+PN532_HSU.cpp:7:PN532_HSU
+
+PN532.cpp:18:PN532
+
+snep.cpp:54:read
+
+mac_link.cpp:7:activateAsTarget
+
+PN532.cpp:29:begin
+
+PN532_HSU.cpp:13:begin
+
+PN532_HSU.cpp:18:wakeup
+
+PN532.cpp:315:SAMConfig
+SAMConfig
+
+PN532_HSU.cpp:38:writeCommand
+
+Write:  14 01 14 01
+PN532_HSU.cpp:148:readAckFrame
+
+Ack:  00 00 FF 00 FF 00
+PN532_HSU.cpp:87:readResponse
+
+Read:   00 00 FF 02 FE D5 15 16 00
+PN532.cpp:120:getFirmwareVersion
+
+PN532_HSU.cpp:38:writeCommand
+
+Write:  02
+PN532_HSU.cpp:148:readAckFrame
+
+Ack:  00 00 FF 00 FF 00
+PN532_HSU.cpp:87:readResponse
+
+Read:   00 00 FF 06 FA D5 03 32 01 06 07 E8 00FIRMWARE RESPONSE:
+ 838927879
+
+PN532.cpp:873:tgInitAsTarget
+
+PN532.cpp:851:tgInitAsTarget
+
+PN532_HSU.cpp:38:writeCommand
+
+Write:  8C 00 00 00 00 00 00 40 01 FE 0F BB BA A6 C9 89 00 00 00 00 00 00 00 00 FF FF 01 FE 0F BB BA A6 C9 89 00 00 06 46 66 6D 01 01 10 00
+PN532_HSU.cpp:148:readAckFrame
+
+Ack:  00 00 FF 00 FF 00
+PN532_HSU.cpp:87:readResponse
+
+Read:  -------Peer to Peer--------
+
+PN532_HSU.cpp:7:PN532_HSU
+
+PN532.cpp:18:PN532
+
+snep.cpp:54:read
+
+mac_link.cpp:7:activateAsTarget
+
+PN532.cpp:29:begin
+
+PN532_HSU.cpp:13:begin
+
+PN532_HSU.cpp:18:wakeup
+
+PN532.cpp:315:SAMConfig
+SAMConfig
+
+PN532_HSU.cpp:38:writeCommand
+
+Write:  14 01 14 01
+PN532_HSU.cpp:148:readAckFrame
+
+Ack:  00 00 FF 00 FF 00
+PN532_HSU.cpp:87:readResponse
+
+Read:   00 00 FF 02 FE D5 15 16 00
+PN532.cpp:120:getFirmwareVersion
+
+PN532_HSU.cpp:38:writeCommand
+
+Write:  02
+PN532_HSU.cpp:148:readAckFrame
+
+Ack:  00 00 FF 00 FF 00
+PN532_HSU.cpp:87:readResponse
+
+Read:   00 00 FF 06 FA D5 03 32 01 06 07 E8 00FIRMWARE RESPONSE:
+ 838927879
+
+PN532.cpp:873:tgInitAsTarget
+
+PN532.cpp:851:tgInitAsTarget
+
+PN532_HSU.cpp:38:writeCommand
+
+Write:  8C 00 00 00 00 00 00 40 01 FE 0F BB BA A6 C9 89 00 00 00 00 00 00 00 00 FF FF 01 FE 0F BB BA A6 C9 89 00 00 06 46 66 6D 01 01 10 00
+PN532_HSU.cpp:148:readAckFrame
+
+Ack:  00 00 FF 00 FF 00
+PN532_HSU.cpp:87:readResponse
+
+Read:  
