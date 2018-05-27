@@ -37,6 +37,21 @@
 volatile xQueueHandle xQueueNFCSend;
 volatile xQueueHandle xQueueNFCReceive;
 
+void USART0_Handler(void){
+	uint32_t ret = usart_get_status(USART0);
+	char c;
+
+	// Verifica por qual motivo entrou na interrup?cao
+	//  - Dado dispon?vel para leitura
+	if(ret & US_IER_RXRDY){
+		usart_serial_getchar(USART0, &c);
+		xQueueSendFromISR(xQueueNFCReceive, &c, NULL);
+		// -  Transmissoa finalizada
+		} else if(ret & US_IER_TXRDY){
+
+	}
+}
+
 
 int usart_get_string(Usart *usart, char buffer[], int bufferlen, int timeout_ms) {
 	long timestart = millis();
@@ -81,27 +96,60 @@ void usart_log(char* name, char* log) {
 
 int taskNfc(void) {
 	//PN532_HSU pn532hsu(Serial1);
-	vTaskDelay(5000);
-	pn532_config();
-	pn532_begin();
-	pn532_wakeup();
-	
-	snep_init();
-	
 	uint8_t ndefBuf[128];
+	uint8_t bufff[256];
+	uint8_t rvb[32];
+	uint8_t c;
+	uint8_t b;
+	int counter = 0;
+	
+	xQueueNFCReceive = xQueueCreate(64,sizeof(uint8_t));
+	if (xQueueNFCReceive == NULL) {
+		printf("Falha em criar a fila\n");
+	}
+	
+	
+	pn532_config();
+	//snep_init();
+	
+	
+	//pn532_wakeup();
+	//snep_read(ndefBuf, sizeof(ndefBuf), 0);
 	
 	for(;;) {
-		// it seems there are some issues to use NdefMessage to decode the received data from Android
-		printf("Get a message from Android");
-		int msgSize = snep_read(ndefBuf, sizeof(ndefBuf), 20000);
-		if (msgSize > 0) {
-			//NdefMessage msg  = NdefMessage(ndefBuf, msgSize);
-			//msg.print();
-			printf("\nSuccess");
-			} else {
-			printf("failed");
+		if (xQueueReceive(xQueueNFCReceive, &c, portMAX_DELAY)) {
+			//printf("%c (%d)\n", c, c);
+			rvb[counter] = c;
+			counter++;
+			
+			if ((char) c == '\0' || counter == 9) {
+				printf("[NFC] EOS reached\n");
+				printf("[NFC] ID is %s\n", rvb);
+				counter = 0;
+				memset(rvb, 0, 32);
+				// ignores backspace entry;
+			}
 		}
-		vTaskDelay(1500);
+	
+		//printf("[Nfc] running...\n");
+		//if(usart_is_rx_ready(USART0)) {
+			//LED_Toggle(LED0);
+			//usart_serial_getchar(USART0, &b);
+			//printf("%x\n", b);
+		//}
+		LED_Toggle(LED0);
+
+		// it seems there are some issues to use NdefMessage to decode the received data from Android
+		//printf("Get a message from Android\n");
+		//int msgSize = snep_read(ndefBuf, sizeof(ndefBuf), 20000);
+		//if (msgSize > 0) {
+			////NdefMessage msg  = NdefMessage(ndefBuf, msgSize);
+			////msg.print();
+			//printf("\nSuccess");
+			//} else {
+			//printf("failed");
+		//}
+		vTaskDelay(10);
 	}
 }
  

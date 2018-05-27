@@ -9,7 +9,7 @@
 #ifndef NFC_H_
 #define NFC_H_
 
-
+void USART0_Handler(void);
 int taskNfc(void);
 extern xQueueHandle xQueueNFCSend;
 extern xQueueHandle xQueueNFCReceive;

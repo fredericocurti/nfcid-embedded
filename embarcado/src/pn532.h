@@ -34,7 +34,9 @@ uint8_t pn532_SAMConfig(void);
 uint32_t pn532_get_firmware_version(void);
 uint8_t pn532_setPassiveActivationRetries(uint8_t maxRetries);
 void pn532_begin();
+void USART1_Handler(void);
 void pn532_wakeup();
+uint8_t serial_write(Usart *pUsart, uint8_t byte);
 
 static uint8_t *pn532_getBuffer(uint8_t *len) {
 	 *len = sizeof(pn532_packetbuffer) - 4;

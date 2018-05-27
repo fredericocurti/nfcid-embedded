@@ -3,12 +3,12 @@
 
 int16_t snep_read(uint8_t *buf, uint8_t len, uint16_t timeout){
  if (0 >= llcp_activate(timeout)) {
-		DMSG("failed to activate PN532 as a target\n");
+		printf("[snep] failed to activate PN532 as a target\n");
 		return -1;
 	}
 
 	if (0 >= llcp_waitForConnection(timeout)) {
-		DMSG("failed to set up a connection\n");
+		printf("[snep] failed to set up a connection\n");
 		return -2;
 	}
 

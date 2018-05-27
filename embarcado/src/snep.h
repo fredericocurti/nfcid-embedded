@@ -23,7 +23,4 @@ static void snep_init() {
 };
 
 
-	
-
-
  #endif // __SNEP_H__
