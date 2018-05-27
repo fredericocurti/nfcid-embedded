@@ -100,36 +100,41 @@ int taskNfc(void) {
 	uint8_t bufff[256];
 	uint8_t rvb[32];
 	uint8_t c;
+	int msgSize;
 	uint8_t b;
 	int counter = 0;
 	
-	xQueueNFCReceive = xQueueCreate(64,sizeof(uint8_t));
+	xQueueNFCReceive = xQueueCreate(256, sizeof(uint8_t));
 	if (xQueueNFCReceive == NULL) {
 		printf("Falha em criar a fila\n");
 	}
 	
-	
-	pn532_config();
-	//snep_init();
-	
-	
-	//pn532_wakeup();
-	//snep_read(ndefBuf, sizeof(ndefBuf), 0);
-	
+	pn532_config(1);
+	snep_init();
+
 	for(;;) {
-		if (xQueueReceive(xQueueNFCReceive, &c, portMAX_DELAY)) {
-			//printf("%c (%d)\n", c, c);
-			rvb[counter] = c;
-			counter++;
-			
-			if ((char) c == '\0' || counter == 9) {
-				printf("[NFC] EOS reached\n");
-				printf("[NFC] ID is %s\n", rvb);
-				counter = 0;
-				memset(rvb, 0, 32);
-				// ignores backspace entry;
-			}
+		printf("[NFC] Reading...\n");
+		
+		msgSize = snep_read(ndefBuf, sizeof(ndefBuf), 0);
+		if (msgSize > 0) {
+			printf("SUCESSO\n");
+		} else {
+			printf("FALHOU\n");
 		}
+		
+		//if (xQueueReceive(xQueueNFCReceive, &c, portMAX_DELAY)) {
+			////printf("%c (%d)\n", c, c);
+			//rvb[counter] = c;
+			//counter++;
+			//
+			//if ((char) c == '\0' || counter == 9) {
+				//printf("[NFC] EOS reached\n");
+				//printf("[NFC] ID is %s\n", rvb);
+				//counter = 0;
+				//memset(rvb, 0, 32);
+				//// ignores backspace entry;
+			//}
+		//}
 	
 		//printf("[Nfc] running...\n");
 		//if(usart_is_rx_ready(USART0)) {
@@ -138,7 +143,7 @@ int taskNfc(void) {
 			//printf("%x\n", b);
 		//}
 		LED_Toggle(LED0);
-
+		
 		// it seems there are some issues to use NdefMessage to decode the received data from Android
 		//printf("Get a message from Android\n");
 		//int msgSize = snep_read(ndefBuf, sizeof(ndefBuf), 20000);
@@ -149,7 +154,6 @@ int taskNfc(void) {
 			//} else {
 			//printf("failed");
 		//}
-		vTaskDelay(10);
 	}
 }
  

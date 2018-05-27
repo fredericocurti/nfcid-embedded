@@ -1,8 +1,9 @@
 #include "mac_link.h"
 
 int8_t link_activateAsTarget(uint16_t timeout) {
-	pn532_begin();
+	pn532_wakeup();
 	pn532_SAMConfig();
+	printf("[pn532] SAMConfig written\n");
 	return pn532_tgInitAsTarget(timeout);
 }
 

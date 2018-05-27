@@ -37,33 +37,45 @@ int8_t receive(uint8_t *buf, int len, uint16_t timeout) {
 	uint8_t b;
 	unsigned long start_millis;
 	
-	//printf("started receiving\n");
-	
+	start_millis = millis();
 	while (read_bytes < len) {
-		start_millis = millis();
-		do {
-			ret = 0;
-			usart_serial_getchar(USART0, &ret);
-			
-			if (ret >= 0) {
-				break;
-			}
-		} while((timeout == 0) || ((millis()- start_millis ) < timeout));
-		
-		if (ret < 0) {
-			if (read_bytes) {
-				return read_bytes;
-			} else {
-				return PN532_TIMEOUT;
-			}
+		if (xQueueReceive(xQueueNFCReceive, &b, 0) == pdTRUE) {
+			start_millis = millis();
+			buf[read_bytes] = b;
+			read_bytes++;
+			printf("%x ", b);		
 		}
 		
-		buf[read_bytes] = (uint8_t)ret;
-		DMSG_HEX(ret);
-		read_bytes++;
+		//if (timeout != 0 && (millis() - start_millis) >= timeout) {
+			//printf("receive timed out\n");
+			//return PN532_TIMEOUT;
+		//}
 	}
+		
+	//while (read_bytes < len) {
+		//start_millis = millis();
+		//do {
+			//ret = 0;
+			//usart_getchar(USART0, &ret);
+			//
+			//if (ret >= 0) {
+				//break;
+			//}
+		//} while((timeout == 0) || ((millis()- start_millis ) < timeout));
+		//
+		//if (ret < 0) {
+			//if (read_bytes) {
+				//return read_bytes;
+			//} else {
+				//return PN532_TIMEOUT;
+			//}
+		//}
+		//
+		//buf[read_bytes] = (uint8_t)ret;
+		//DMSG_HEX(ret);
+		//read_bytes++;
+	//}
 
-	printf("\n");
 	return read_bytes;
 }
 
@@ -87,7 +99,7 @@ int8_t pn532_read_ack_frame() {
 	return 0;
 }
 
-void pn532_config(void) {
+void pn532_config(int enableIterrupt) {
 	usart_serial_options_t config;
 	config.baudrate = 115200;
 	config.charlength = US_MR_CHRL_8_BIT;
@@ -106,9 +118,12 @@ void pn532_config(void) {
 	usart_enable_tx(USART0);
 	usart_enable_rx(USART0);
 	
-	usart_enable_interrupt(USART0, US_IER_RXRDY);
-	NVIC_SetPriority(ID_USART0, 4);
-	NVIC_EnableIRQ(ID_USART0);
+	if (enableIterrupt) {
+		usart_enable_interrupt(USART0, US_IER_RXRDY);
+		NVIC_SetPriority(ID_USART0, 4);
+		NVIC_EnableIRQ(ID_USART0);		
+	}
+
 }
 
 void pn532_begin() {
@@ -126,19 +141,8 @@ void pn532_wakeup() {
 	usart_putchar(USART0, 0x0);
 	usart_putchar(USART0, 0x0);
 	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
 	
-	delay_s(5);
+	delay_s(2);
 
 	/** dump serial buffer */
 	if(usart_is_rx_ready(USART0)){
@@ -168,6 +172,7 @@ int8_t pn532_write_command(uint8_t *header, uint8_t hlen, uint8_t *body, uint8_t
 		DMSG_HEX(ret);
 	}
 	
+	xQueueReset(xQueueNFCReceive);
 	command = header[0];
 	
 	usart_putchar(USART0, (uint8_t) PN532_PREAMBLE);
@@ -181,24 +186,28 @@ int8_t pn532_write_command(uint8_t *header, uint8_t hlen, uint8_t *body, uint8_t
 	usart_putchar(USART0, (uint8_t) PN532_HOSTTOPN532);
 	uint8_t sum = PN532_HOSTTOPN532;    // sum of TFI + DATA
 
-	printf("\nWrite: ");
 	usart_serial_write_packet(USART0, header, hlen);
 	
 	for (uint8_t i = 0; i < hlen; i++) {
 		sum += header[i];
-		DMSG_HEX(header[i]);
+		//DMSG_HEX(header[i]);
 	}
 
 	usart_serial_write_packet(USART0, body, blen);
 	for (uint8_t i = 0; i < blen; i++) {
 		sum += body[i];
-		DMSG_HEX(body[i]);
+		//DMSG_HEX(body[i]);
 	}
 
 	uint8_t checksum = ~sum + 1;            // checksum of TFI + DATA
 	usart_putchar(USART0, checksum);
 	usart_putchar(USART0, (uint8_t) PN532_POSTAMBLE);
 
+	printf("\nWrite: ");
+	for (uint8_t i = 0; i < hlen; i++) {
+		DMSG_HEX(header[i]);
+	}
+	
 	return pn532_read_ack_frame();
 }
 
@@ -206,13 +215,15 @@ int16_t pn532_read_response(uint8_t buf[], uint8_t len, uint16_t timeout)
 {
 	uint8_t tmp[3];
 	
-	delay_ms(100);
-	DMSG("\nRead:  ");
+	//delay_ms(100);
+	printf("\nRead: ");
 	
 	/** Frame Preamble and Start Code */
 	if(receive(tmp, 3, timeout)<=0) {
+		printf("timeout!\n");
 		return PN532_TIMEOUT;
 	}
+	
 	if(0 != tmp[0] || 0!= tmp[1] || 0xFF != tmp[2]){
 		DMSG("Preamble error");
 		return PN532_INVALID_FRAME;
@@ -258,7 +269,6 @@ int16_t pn532_read_response(uint8_t buf[], uint8_t len, uint16_t timeout)
 		DMSG("Checksum error");
 		return PN532_INVALID_FRAME;
 	}
-	
 	return length[0];
 }
 
@@ -299,7 +309,7 @@ int16_t pn532_tgGetData(uint8_t *buf, uint8_t len)
 {
 	buf[0] = PN532_COMMAND_TGGETDATA;
 
-	if (pn532_write_command(buf, 1, 0, 0)) {
+	if (pn532_write_command(buf, 1, NULL, 0)) {
 		return -1;
 	}
 
@@ -361,7 +371,7 @@ uint32_t pn532_get_firmware_version(void)
 
 	pn532_packetbuffer[0] = PN532_COMMAND_GETFIRMWAREVERSION;
 
-	if (pn532_write_command(pn532_packetbuffer, 1, 0, 0)) {
+	if (pn532_write_command(pn532_packetbuffer, 1, NULL, 0)) {
 		return 0;
 	}
 
@@ -399,21 +409,19 @@ uint8_t pn532_setPassiveActivationRetries(uint8_t maxRetries) {
 }
 
 uint8_t pn532_SAMConfig(void) {
-	uint8_t pb[64];
-	pb[0] = PN532_COMMAND_SAMCONFIGURATION;
-	pb[1] = 0x01; // normal mode
-	pb[2] = 0x14; // timeout 50ms * 20 = 1 second
-	pb[3] = 0x01; // use IRQ pin!
+	//uint8_t pb[64];
+	pn532_packetbuffer[0] = PN532_COMMAND_SAMCONFIGURATION;
+	pn532_packetbuffer[1] = 0x01; // normal mode
+	pn532_packetbuffer[2] = 0x14; // timeout 50ms * 20 = 1 second
+	pn532_packetbuffer[3] = 0x01; // use IRQ pin!
 	
-	printf("[pn532] Writing SAMConfig\n");
+	printf("[pn532] Writing SAMConfig");
 	
-	if (pn532_write_command(pb, 4, 0, 0)) {
+	if (pn532_write_command(pn532_packetbuffer, 4, NULL, 0)) {
 		return 0;
 	}
 	
-	printf("SAMConfig written\n");
-	
-	return (0 < pn532_read_response(pb, sizeof(pb), 1000));
+	return (0 < pn532_read_response(pn532_packetbuffer, sizeof(pn532_packetbuffer), 1000));
 }
 
 uint8_t pn532_readPassiveTargetID(uint8_t cardBaudrate, uint8_t *uid, uint8_t *uidLength, uint16_t timeout, uint8_t inlist) {

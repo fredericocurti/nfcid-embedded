@@ -59,7 +59,7 @@ status_code_t usart_serial_write_packet(usart_if usart, const uint8_t *data,
 		size_t len)
 {
 	while (len) {
-		usart_serial_putchar(usart, (uint8_t) *data);
+		usart_putchar(usart, (uint8_t) *data);
 		len--;
 		data++;
 	}
