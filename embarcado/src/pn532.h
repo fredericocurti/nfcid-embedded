@@ -11,7 +11,6 @@
 
 #include <asf.h>
 
-void pn532_config(void);
 uint8_t command;
 uint8_t _uid[7];  // ISO14443A uid
 uint8_t _uidLen;  // uid len
@@ -27,6 +26,7 @@ void DMSG_HEX(uint32_t val);
 void DMSG_INT(uint32_t val);
 void DMSG(char* log);
 
+int8_t pn532_write_command(uint8_t *header, uint8_t hlen, uint8_t *body, uint8_t blen);
 int16_t pn532_tgGetData(uint8_t *buf, uint8_t len);
 int8_t pn532_tgInitAsTarget(uint16_t timeout);
 bool pn532_tgSetData(const uint8_t *header, uint8_t hlen, const uint8_t *body, uint8_t blen);
@@ -34,7 +34,10 @@ uint8_t pn532_SAMConfig(void);
 uint32_t pn532_get_firmware_version(void);
 uint8_t pn532_setPassiveActivationRetries(uint8_t maxRetries);
 void pn532_begin();
+void USART1_Handler(void);
 void pn532_wakeup();
+void pn532_config(int enableIterrupt);
+uint8_t serial_write(Usart *pUsart, uint8_t byte);
 
 static uint8_t *pn532_getBuffer(uint8_t *len) {
 	 *len = sizeof(pn532_packetbuffer) - 4;

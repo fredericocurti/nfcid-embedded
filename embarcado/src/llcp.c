@@ -130,8 +130,7 @@ bool llcp_write(const uint8_t *header, uint8_t hlen, const uint8_t *body, uint8_
     return true;
 }
 
-int16_t llcp_read(uint8_t *buf, uint8_t length)
-{
+int16_t llcp_read(uint8_t *buf, uint8_t length) {
     uint8_t type;
     uint16_t status;
 

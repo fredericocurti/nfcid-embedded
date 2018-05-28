@@ -129,10 +129,11 @@ static void taskMain(void *pvParameters) {
 	int counter = 0;
 	
 	char id[] = "testeee";
-	int isValid = 0;		
+	int isValid = 0;
+	vTaskDelay(3000);
 	
 	for (;;) {
-		printf("[Main] Main running...\n");
+		//printf("[Main] Main running...\n");
 		//isValid = validateId(id); // FAZ O REQUEST E RETORNA SE O ID E VALIDO OU NAO
 
 		//isValid == 1
@@ -148,8 +149,8 @@ static void taskLed(void *pvParameters) {
 		
 	for (;;) {
 		LED_Toggle(LED0);
-		printf("[LED] Rodando...\n");
-		vTaskDelay(5000);
+		//printf("[LED] Rodando...\n");
+		vTaskDelay(10000);
 	}
 }
 
@@ -180,10 +181,10 @@ int main(void) {
 	//}
 		/* Create task to monitor processor activity */
 		
-	if (xTaskCreate(taskMonitor, "Monitor", TASK_MONITOR_STACK_SIZE, NULL,
-	TASK_MONITOR_STACK_PRIORITY, NULL) != pdPASS) {
-		printf("Failed to create Monitor task\r\n");
-	}
+	//if (xTaskCreate(taskMonitor, "Monitor", TASK_MONITOR_STACK_SIZE, NULL,
+	//TASK_MONITOR_STACK_PRIORITY, NULL) != pdPASS) {
+		//printf("Failed to create Monitor task\r\n");
+	//}
 	
 	//if (xTaskCreate(taskWifi, "Wifi", TASK_LED_STACK_SIZE, NULL,
 	//TASK_LED_STACK_PRIORITY, NULL) != pdPASS) {

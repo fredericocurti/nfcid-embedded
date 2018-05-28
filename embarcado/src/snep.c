@@ -2,24 +2,29 @@
 #include "pn532.h"
 
 int16_t snep_read(uint8_t *buf, uint8_t len, uint16_t timeout){
- if (0 >= llcp_activate(timeout)) {
-		DMSG("failed to activate PN532 as a target\n");
+	printf("[snep] Starting to read\n");
+	if (0 >= llcp_activate(timeout)) {
+		printf("[snep] failed to activate PN532 as a target\n");
 		return -1;
 	}
+	printf("[snep] activation complete\n");
 
 	if (0 >= llcp_waitForConnection(timeout)) {
-		DMSG("failed to set up a connection\n");
+		printf("[snep] failed to set up a connection\n");
 		return -2;
 	}
-
+	
+	printf("[snep] connection complete\n");
+	
 	uint16_t status = llcp_read(buf, len);
+
 	if (6 > status) {
 		return -3;
 	}
-
+	
 	// check SNEP version
 	if (SNEP_DEFAULT_VERSION != buf[0]) {
-		DMSG("The received SNEP message's major version is different\n");
+		printf("[snep] The received SNEP message's major version is different\n");
 		// To-do: send Unsupported Version response
 		return -4;
 	}
@@ -40,6 +45,7 @@ int16_t snep_read(uint8_t *buf, uint8_t len, uint16_t timeout){
 		DMSG("\n");
 		return -4;
 	}
+	
 	for (uint8_t i = 0; i < length; i++) {
 		buf[i] = buf[i + 6];
 	}

@@ -1732,8 +1732,7 @@ uint32_t usart_write(Usart *p_usart, uint32_t c)
  * \retval 0 on success.
  * \retval 1 on failure.
  */
-uint32_t usart_putchar(Usart *p_usart, uint32_t c)
-{
+uint32_t usart_putchar(Usart *p_usart, uint32_t c) {
 	while (!(p_usart->US_CSR & US_CSR_TXRDY)) {
 	}
 
