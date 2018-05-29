@@ -1,5 +1,6 @@
 #include "snep.h"
 #include "pn532.h"
+#include "nfc.h"
 
 int16_t snep_read(uint8_t *buf, uint8_t len, uint16_t timeout){
 	printf("[snep] Starting to read\n");
@@ -58,6 +59,6 @@ int16_t snep_read(uint8_t *buf, uint8_t len, uint16_t timeout){
 	headerBuf[4] = 0;
 	headerBuf[5] = 0;
 	llcp_write(headerBuf, 6, 0, 0);
-	
+
 	return length;
 }

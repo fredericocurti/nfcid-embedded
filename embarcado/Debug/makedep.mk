@@ -2,6 +2,10 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+src\ASF\common\services\sleepmgr\sam\sleepmgr.c
+
+src\ASF\sam\drivers\rtc\rtc.c
+
 src\ASF\thirdparty\freertos\freertos-7.3.0\source\FreeRTOS_CLI.c
 
 src\ASF\thirdparty\freertos\freertos-7.3.0\source\list.c

@@ -34,8 +34,10 @@
 #include "systick.h"
 #include "snep.h"
 
-volatile xQueueHandle xQueueNFCSend;
-volatile xQueueHandle xQueueNFCReceive;
+volatile xQueueHandle xQueueNfc;
+volatile xQueueHandle xQueueUsartBuffer;
+volatile xTimerHandle xTimerNfc;
+volatile alarm = 0;
 
 void USART0_Handler(void){
 	uint32_t ret = usart_get_status(USART0);
@@ -45,82 +47,87 @@ void USART0_Handler(void){
 	//  - Dado dispon?vel para leitura
 	if(ret & US_IER_RXRDY){
 		usart_serial_getchar(USART0, &c);
-		xQueueSendFromISR(xQueueNFCReceive, &c, NULL);
+		xQueueSendFromISR(xQueueUsartBuffer, &c, NULL);
 		// -  Transmissoa finalizada
 		} else if(ret & US_IER_TXRDY){
 
 	}
 }
 
-
-int usart_get_string(Usart *usart, char buffer[], int bufferlen, int timeout_ms) {
-	long timestart = millis();
-	uint32_t rx;
-	uint32_t counter = 0;
+void decodeMessage(uint8_t * data, int numBytes) {
+	uint32_t szPos;
+	uint8_t id[32];
+	int c = 0;
 	
-	while(millis() - timestart < timeout_ms && counter < bufferlen - 1) {
-		if(usart_read(usart, &rx) == 0) {
-			//timestart = g_systimer; // reset timeout
-			buffer[counter++] = rx;
+	memset(id, 0, 32);
+	for ( szPos = 0; szPos < numBytes; szPos++) {
+		if (data[szPos] <= 0x1F || data[szPos] < 48 || data[szPos] > 57) {
+		} else {
+			id[c] = (char)data[szPos];
+			c++;
 		}
 	}
-	buffer[counter] = 0x00;
-	return counter;
+
+	id[c] = '\0';
+	
+	xQueueSend(xQueueNfc, id, portMAX_DELAY);
+	return;
 }
 
-void usart_send_command(Usart *usart, char buffer_rx[], int bufferlen, char buffer_tx[], int timeout) {
-	usart_put_string(usart, buffer_tx);
-	usart_get_string(usart, buffer_rx, bufferlen, timeout);
+void flash_led(){
+	for (int i = 0; i < 6; i++) {
+		LED_Toggle(LED0);
+		delay_ms(10);
+	}
+	LED_Off(LED0);
 }
 
-void usart_log(char* name, char* log) {
-	usart_put_string(USART1, "[");
-	usart_put_string(USART1, name);
-	usart_put_string(USART1, "] ");
-	usart_put_string(USART1, log);
-	usart_put_string(USART1, "\r\n");
+void onTimeout( xTimerHandle xTimer ) {
+	printf("Timer callback!!\n");
+	alarm = 1;
 }
 
-//void config_console(void) {
-	//usart_serial_options_t config;
-	//config.baudrate = 115200;
-	//config.charlength = US_MR_CHRL_8_BIT;
-	//config.paritytype = US_MR_PAR_NO;
-	//config.stopbits = false;
-	//usart_serial_init(USART1, &config);
-	//usart_enable_tx(USART1);
-	//usart_enable_rx(USART1);
-//}
-//
 
 
 int taskNfc(void) {
 	//PN532_HSU pn532hsu(Serial1);
 	uint8_t ndefBuf[128];
-	uint8_t bufff[256];
-	uint8_t rvb[32];
+	uint8_t decodedMessage[32];
 	uint8_t c;
+	uint32_t h, m, s;
 	int msgSize;
 	uint8_t b;
-	int counter = 0;
 	
-	xQueueNFCReceive = xQueueCreate(256, sizeof(uint8_t));
-	if (xQueueNFCReceive == NULL) {
+	xQueueUsartBuffer = xQueueCreate(1024, sizeof(uint8_t));
+	if (xQueueUsartBuffer == NULL) {
 		printf("Falha em criar a fila\n");
 	}
 	
+	xQueueNfc = xQueueCreate(4, sizeof(uint8_t[32]));
+	if (xQueueNfc == NULL) {
+		printf("Falha em criar a fila\n");
+	}
+	
+	xTimerNfc = xTimerCreate("receiveTimeout", 5000, pdTRUE, NULL, onTimeout);
+	
+	vTaskDelay(1000);
 	pn532_config(1);
 	snep_init();
-
+	printf("[NFC] Starting...\n");
+	xTimerStart(xTimerNfc, 0);
+	
 	for(;;) {
-		printf("[NFC] Reading...\n");
-		
+		xTimerReset(xTimerNfc, 0);
+		alarm = 0;
 		msgSize = snep_read(ndefBuf, sizeof(ndefBuf), 0);
+		// Chegou algo!
 		if (msgSize > 0) {
-			printf("SUCESSO\n");
-		} else {
-			printf("FALHOU\n");
+			xTimerReset(xTimerNfc, 0);
+			// decodeMessage é responsável por colocar a string na fila!
+			decodeMessage(ndefBuf, msgSize);
 		}
+		
+		//decodeMessage(&ndefBuf, msgSize, &decodedMessage);
 		
 		//if (xQueueReceive(xQueueNFCReceive, &c, portMAX_DELAY)) {
 			////printf("%c (%d)\n", c, c);
@@ -142,7 +149,6 @@ int taskNfc(void) {
 			//usart_serial_getchar(USART0, &b);
 			//printf("%x\n", b);
 		//}
-		LED_Toggle(LED0);
 		
 		// it seems there are some issues to use NdefMessage to decode the received data from Android
 		//printf("Get a message from Android\n");

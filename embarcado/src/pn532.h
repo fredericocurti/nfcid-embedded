@@ -5,7 +5,6 @@
  *  Author: eduardomarossi
  */ 
 
-
 #ifndef PN532_H_
 #define PN532_H_
 
@@ -19,6 +18,7 @@ uint8_t inListedTag; // Tg number of inlisted tag.
 uint8_t _felicaIDm[8]; // FeliCa IDm (NFCID2)
 uint8_t _felicaPMm[8]; // FeliCa PMm (PAD)
 uint8_t pn532_packetbuffer[64];
+
 
 
 void usart_put_string(Usart *usart, char str[]);
@@ -36,7 +36,7 @@ uint8_t pn532_setPassiveActivationRetries(uint8_t maxRetries);
 void pn532_begin();
 void USART1_Handler(void);
 void pn532_wakeup();
-void pn532_config(int enableIterrupt);
+void pn532_config();
 uint8_t serial_write(Usart *pUsart, uint8_t byte);
 
 static uint8_t *pn532_getBuffer(uint8_t *len) {

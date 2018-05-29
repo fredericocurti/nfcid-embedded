@@ -18,6 +18,9 @@
 #define STRING_HEADER "-- WINC1500 weather client example --"STRING_EOL	\
 	"-- "BOARD_NAME " --"STRING_EOL	\
 	"-- Compiled: "__DATE__ " "__TIME__ " --"STRING_EOL
+	
+
+
 /**
  * \brief Configure UART console.
  */
@@ -33,7 +36,7 @@ extern void vApplicationTickHook(void);
 extern void vApplicationMallocFailedHook(void);
 extern void xPortSysTickHandler(void);
 
-
+uint8_t RTC_ready = 0;
 
 // FUNCTIONS
 
@@ -128,21 +131,67 @@ static void taskMain(void *pvParameters) {
 	UNUSED(pvParameters);
 	int counter = 0;
 	
-	char id[] = "testeee";
+	char id[32];
 	int isValid = 0;
-	vTaskDelay(3000);
 	
 	for (;;) {
-		//printf("[Main] Main running...\n");
+		printf("[Main] Main waiting for NFC...\n");
+		xQueueReceive(xQueueNfc, &id, portMAX_DELAY);
+		vTaskDelay(50);
+		//flash_led();
+		printf("[Main] ID is %s\n", id);
+	
 		//isValid = validateId(id); // FAZ O REQUEST E RETORNA SE O ID E VALIDO OU NAO
 
 		//isValid == 1
 			//? printf("[Main] ID: %s is VALID\n", id)
 			//: printf("[Main] ID: %s is INVALID\n", id);
-			
-		vTaskDelay(10000);	
+				
 	}
 }
+
+
+void RTC_init(){
+	/* Configura o PMC */
+	pmc_enable_periph_clk(ID_RTC);
+	
+	/* Default RTC configuration, 24-hour mode */
+
+	/* Configura data e hora manualmente */
+	rtc_set_date(RTC, YEAR, MOUNTH, DAY, WEEK);
+	rtc_set_time(RTC, HOUR, MINUTE, SECOND);
+
+	/* Configure RTC interrupts */
+	//NVIC_DisableIRQ(RTC_IRQn);
+	NVIC_ClearPendingIRQ(RTC_IRQn);
+	NVIC_SetPriority(RTC_IRQn, 0);
+	NVIC_EnableIRQ(RTC_IRQn);
+
+	/* Ativa interrupcao via alarme */
+	rtc_enable_interrupt(RTC,  RTC_IER_ALREN);
+
+}
+
+void RTC_Handler(void) {
+	uint32_t ul_status = rtc_get_status(RTC);
+	
+	// get current time
+	uint32_t h, m, s;
+	rtc_get_time(RTC,&h,&m,&s);
+	
+	/* Time or date alarm */
+	if ((ul_status & RTC_SR_ALARM) == RTC_SR_ALARM && RTC_ready) {
+		printf("[RTC] NFC is taking too long!\n");
+		rtc_clear_status(RTC, RTC_SCCR_ALRCLR);
+		//rtc_set_time_alarm(RTC, 1, h, 1, m, 1, s + 3);
+	}
+	
+	rtc_clear_status(RTC, RTC_SCCR_ACKCLR);
+	rtc_clear_status(RTC, RTC_SCCR_TIMCLR);
+	rtc_clear_status(RTC, RTC_SCCR_CALCLR);
+	rtc_clear_status(RTC, RTC_SCCR_TDERRCLR);
+}
+
 
 static void taskLed(void *pvParameters) {
 	UNUSED(pvParameters);
@@ -150,7 +199,7 @@ static void taskLed(void *pvParameters) {
 	for (;;) {
 		LED_Toggle(LED0);
 		//printf("[LED] Rodando...\n");
-		vTaskDelay(10000);
+		vTaskDelay(1000);
 	}
 }
 
@@ -171,8 +220,12 @@ int main(void) {
 	/* Initialize the UART console. */
 	configure_console();
 	printf(STRING_HEADER);
+	//
+	//RTC_init();
+	//RTC_ready = 1;
 	
-	delay_s(5);
+	delay_s(4);
+	printf("---- RTOS Starting ----\n");
 	
 	//wifiInit();
 	//wifiIsConnected = wifiInit();
@@ -192,17 +245,17 @@ int main(void) {
 	//}
 
 	if (xTaskCreate(taskMain, "MAIN", TASK_MONITOR_STACK_SIZE, NULL,
-	TASK_LED_STACK_PRIORITY, NULL) != pdPASS) {
+	3, NULL) != pdPASS) {
 		printf("Failed to create Main task\r\n");
 	}
 	
-	if (xTaskCreate(taskNfc, "NFC", TASK_MONITOR_STACK_SIZE, NULL,
-	TASK_LED_STACK_PRIORITY, NULL) != pdPASS) {
+	if (xTaskCreate(taskNfc, "NFC", TASK_MONITOR_STACK_SIZE * 4, NULL,
+	3, NULL) != pdPASS) {
 		printf("Failed to create NFC task\r\n");
 	}
 	
 	if (xTaskCreate(taskLed, "LED", TASK_MONITOR_STACK_SIZE, NULL,
-	TASK_LED_STACK_PRIORITY, NULL) != pdPASS) {
+	3, NULL) != pdPASS) {
 		printf("Failed to create LED task\r\n");
 	}
 	

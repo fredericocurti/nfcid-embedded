@@ -36,21 +36,35 @@ int8_t receive(uint8_t *buf, int len, uint16_t timeout) {
 	uint8_t ret;
 	uint8_t b;
 	unsigned long start_millis;
-	
-	start_millis = millis();
-	while (read_bytes < len) {
-		if (xQueueReceive(xQueueNFCReceive, &b, 0) == pdTRUE) {
-			start_millis = millis();
+	alarm = 0;
+
+	xTimerReset(xTimerNfc, 0);
+	//start_millis = millis();
+	while (read_bytes < len && !alarm) {
+		if (xQueueReceive(xQueueUsartBuffer, &b, 0) == pdTRUE) {
+			//xTimerReset(xTimerNfc, 0);
+			//start_millis = millis();
 			buf[read_bytes] = b;
 			read_bytes++;
-			printf("%x ", b);		
+			printf("%x ", b);
+			//start_millis = millis();
 		}
-		
+		//} else {
+		//}
+		//if (timeout != 0 && time <= 0){
+
+		//}
 		//if (timeout != 0 && (millis() - start_millis) >= timeout) {
-			//printf("receive timed out\n");
-			//return PN532_TIMEOUT;
+
 		//}
 	}
+	
+	if (alarm) {
+		alarm = 0;
+		return PN532_TIMEOUT;
+	}
+	
+	
 		
 	//while (read_bytes < len) {
 		//start_millis = millis();
@@ -99,7 +113,7 @@ int8_t pn532_read_ack_frame() {
 	return 0;
 }
 
-void pn532_config(int enableIterrupt) {
+void pn532_config() {
 	usart_serial_options_t config;
 	config.baudrate = 115200;
 	config.charlength = US_MR_CHRL_8_BIT;
@@ -115,14 +129,16 @@ void pn532_config(int enableIterrupt) {
 	pio_configure(PIOB, PIO_PERIPH_C, (1 << 0), PIO_DEFAULT);
 	pio_configure(PIOB, PIO_PERIPH_C, (1 << 1), PIO_DEFAULT);
 	
+	usart_disable_interrupt(USART0, 0xffffffff);
+	
 	usart_enable_tx(USART0);
 	usart_enable_rx(USART0);
 	
-	if (enableIterrupt) {
-		usart_enable_interrupt(USART0, US_IER_RXRDY);
-		NVIC_SetPriority(ID_USART0, 4);
-		NVIC_EnableIRQ(ID_USART0);		
-	}
+
+	usart_enable_interrupt(USART0, US_IER_RXRDY);
+	NVIC_SetPriority(ID_USART0, 4);
+	NVIC_EnableIRQ(ID_USART0);
+
 
 }
 
@@ -141,8 +157,11 @@ void pn532_wakeup() {
 	usart_putchar(USART0, 0x0);
 	usart_putchar(USART0, 0x0);
 	usart_putchar(USART0, 0x0);
-	
-	delay_s(2);
+	usart_write(USART0, 0x0);
+	usart_write(USART0, 0x0);
+	usart_write(USART0, 0x0);
+	usart_write(USART0, 0x0);
+	usart_write(USART0, 0x0);
 
 	/** dump serial buffer */
 	if(usart_is_rx_ready(USART0)){
@@ -172,7 +191,7 @@ int8_t pn532_write_command(uint8_t *header, uint8_t hlen, uint8_t *body, uint8_t
 		DMSG_HEX(ret);
 	}
 	
-	xQueueReset(xQueueNFCReceive);
+	xQueueReset(xQueueUsartBuffer);
 	command = header[0];
 	
 	usart_putchar(USART0, (uint8_t) PN532_PREAMBLE);

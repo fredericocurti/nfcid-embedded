@@ -31,7 +31,6 @@ int16_t link_read(uint8_t *buf, uint8_t len);
 int8_t link_activateAsTarget(uint16_t timeout);
 
 static uint8_t *link_getHeaderBuffer(uint8_t *len) {
-	printf("Maclink getHeaderBuffer\n");
     return pn532_getBuffer(len);
 };
 
