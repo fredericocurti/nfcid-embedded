@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">NDEFred</string>
+    <string name="n_mero_de_matr_cula">Número de matrícula</string>
 </resources>
