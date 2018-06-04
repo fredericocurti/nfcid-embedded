@@ -9,6 +9,7 @@
 #ifndef NFC_H_
 #define NFC_H_
 
+#define USART_NFC USART2
 
 #define YEAR        2018
 #define MOUNTH      3
@@ -17,7 +18,6 @@
 #define HOUR        15
 #define MINUTE      1
 #define SECOND      0
-
 
 
 void flash_led(void);

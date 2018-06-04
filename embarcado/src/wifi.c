@@ -202,7 +202,6 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
 						response = pstrRecv->pu8Buffer[position + strlen("status\": \"")] == '1' ? 1 : 0;
 						printf("[Wifi] RESPONSE %d \n", response);
 						xQueueSendFromISR(xQueueWifiReceive, &response, NULL );
-					
 					}
 					
 					memset(gau8ReceivedBuffer, 0, sizeof(gau8ReceivedBuffer));
@@ -368,7 +367,7 @@ uint8_t taskWifi(void) {
 		}
 		
 		//printf("[Wifi] loop\n");
-		vTaskDelay(250);
+		vTaskDelay(50);
 		
 	}
 	

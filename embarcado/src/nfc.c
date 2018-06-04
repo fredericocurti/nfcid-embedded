@@ -39,14 +39,14 @@ volatile xQueueHandle xQueueUsartBuffer;
 volatile xTimerHandle xTimerNfc;
 volatile alarm = 0;
 
-void USART0_Handler(void){
-	uint32_t ret = usart_get_status(USART0);
+void USART2_Handler(void){
+	uint32_t ret = usart_get_status(USART2);
 	char c;
 
 	// Verifica por qual motivo entrou na interrup?cao
 	//  - Dado dispon?vel para leitura
 	if(ret & US_IER_RXRDY){
-		usart_serial_getchar(USART0, &c);
+		usart_serial_getchar(USART2, &c);
 		xQueueSendFromISR(xQueueUsartBuffer, &c, NULL);
 		// -  Transmissoa finalizada
 		} else if(ret & US_IER_TXRDY){

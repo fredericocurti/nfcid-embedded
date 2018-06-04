@@ -134,19 +134,19 @@ static void taskMain(void *pvParameters) {
 	char id[32];
 	int isValid = 0;
 	
+	vTaskDelay(5000);
+		
 	for (;;) {
 		printf("[Main] Main waiting for NFC...\n");
 		xQueueReceive(xQueueNfc, &id, portMAX_DELAY);
-		vTaskDelay(50);
 		//flash_led();
 		printf("[Main] ID is %s\n", id);
 	
-		//isValid = validateId(id); // FAZ O REQUEST E RETORNA SE O ID E VALIDO OU NAO
+		isValid = validateId(id); // FAZ O REQUEST E RETORNA SE O ID E VALIDO OU NAO
 
-		//isValid == 1
-			//? printf("[Main] ID: %s is VALID\n", id)
-			//: printf("[Main] ID: %s is INVALID\n", id);
-				
+		isValid == 1
+			? printf("[Main] ID: %s is VALID\n", id)
+			: printf("[Main] ID: %s is INVALID\n", id);		
 	}
 }
 
@@ -239,10 +239,10 @@ int main(void) {
 		//printf("Failed to create Monitor task\r\n");
 	//}
 	
-	//if (xTaskCreate(taskWifi, "Wifi", TASK_LED_STACK_SIZE, NULL,
-	//TASK_LED_STACK_PRIORITY, NULL) != pdPASS) {
-		//printf("Failed to create Wifi task\r\n");
-	//}
+	if (xTaskCreate(taskWifi, "Wifi", TASK_LED_STACK_SIZE, NULL,
+	3, NULL) != pdPASS) {
+		printf("Failed to create Wifi task\r\n");
+	}
 
 	if (xTaskCreate(taskMain, "MAIN", TASK_MONITOR_STACK_SIZE, NULL,
 	3, NULL) != pdPASS) {

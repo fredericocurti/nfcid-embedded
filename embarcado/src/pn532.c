@@ -120,26 +120,23 @@ void pn532_config() {
 	config.paritytype = US_MR_PAR_NO;
 	config.stopbits = US_MR_NBSTOP_1_BIT;
 	
-	sysclk_enable_peripheral_clock(ID_USART0);
-	sysclk_enable_peripheral_clock(ID_PIOB);
+	sysclk_enable_peripheral_clock(ID_USART2);
+	sysclk_enable_peripheral_clock(ID_PIOD);
 	
-	usart_serial_init(USART0, &config);
+	usart_serial_init(USART_NFC, &config);
 
 	// RX - PB0  TX - PB1
-	pio_configure(PIOB, PIO_PERIPH_C, (1 << 0), PIO_DEFAULT);
-	pio_configure(PIOB, PIO_PERIPH_C, (1 << 1), PIO_DEFAULT);
+	pio_configure(PIOD, PIO_PERIPH_B, (1 << 15), PIO_DEFAULT); // RX
+	pio_configure(PIOD, PIO_PERIPH_B, (1 << 16), PIO_DEFAULT); // TX
 	
-	usart_disable_interrupt(USART0, 0xffffffff);
+	usart_disable_interrupt(USART_NFC, 0xffffffff);
 	
-	usart_enable_tx(USART0);
-	usart_enable_rx(USART0);
-	
+	usart_enable_tx(USART_NFC);
+	usart_enable_rx(USART_NFC);
 
-	usart_enable_interrupt(USART0, US_IER_RXRDY);
-	NVIC_SetPriority(ID_USART0, 4);
-	NVIC_EnableIRQ(ID_USART0);
-
-
+	usart_enable_interrupt(USART_NFC, US_IER_RXRDY);
+	NVIC_SetPriority(ID_USART2, 4);
+	NVIC_EnableIRQ(ID_USART2);
 }
 
 void pn532_begin() {
@@ -148,29 +145,29 @@ void pn532_begin() {
 
 
 void pn532_wakeup() {
-	if(usart_is_tx_ready(USART0)){
+	if(usart_is_tx_ready(USART_NFC)){
 		printf("[pn532] sending wakeup!\n");
 	}
 	
-	usart_putchar(USART0, 0x55);
-	usart_putchar(USART0, 0x55);
-	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
-	usart_putchar(USART0, 0x0);
-	usart_write(USART0, 0x0);
-	usart_write(USART0, 0x0);
-	usart_write(USART0, 0x0);
-	usart_write(USART0, 0x0);
-	usart_write(USART0, 0x0);
+	usart_putchar(USART_NFC, 0x55);
+	usart_putchar(USART_NFC, 0x55);
+	usart_putchar(USART_NFC, 0x0);
+	usart_putchar(USART_NFC, 0x0);
+	usart_putchar(USART_NFC, 0x0);
+	usart_write(USART_NFC, 0x0);
+	usart_write(USART_NFC, 0x0);
+	usart_write(USART_NFC, 0x0);
+	usart_write(USART_NFC, 0x0);
+	usart_write(USART_NFC, 0x0);
 
 	/** dump serial buffer */
-	if(usart_is_rx_ready(USART0)){
+	if(usart_is_rx_ready(USART_NFC)){
 		DMSG("Dump serial buffer: ");
 	}
 	
-	while(usart_is_rx_ready(USART0)){
+	while(usart_is_rx_ready(USART_NFC)){
 		uint8_t ret;
-		usart_getchar(USART0, &ret);
+		usart_getchar(USART_NFC, &ret);
 		DMSG_HEX(ret);
 	}
 	
@@ -181,46 +178,46 @@ void pn532_wakeup() {
 
 int8_t pn532_write_command(uint8_t *header, uint8_t hlen, uint8_t *body, uint8_t blen) {
 	/** dump serial buffer */
-	if(usart_is_rx_ready(USART0)){
+	if(usart_is_rx_ready(USART_NFC)){
 		DMSG("Dump serial buffer: ");
 	}
 	
-	while(usart_is_rx_ready(USART0)){
+	while(usart_is_rx_ready(USART_NFC)){
 		uint32_t ret;
-		usart_serial_getchar(USART0, &ret);
+		usart_serial_getchar(USART_NFC, &ret);
 		DMSG_HEX(ret);
 	}
 	
 	xQueueReset(xQueueUsartBuffer);
 	command = header[0];
 	
-	usart_putchar(USART0, (uint8_t) PN532_PREAMBLE);
-	usart_putchar(USART0, (uint8_t) PN532_STARTCODE1);
-	usart_putchar(USART0, (uint8_t) PN532_STARTCODE2);
+	usart_putchar(USART_NFC, (uint8_t) PN532_PREAMBLE);
+	usart_putchar(USART_NFC, (uint8_t) PN532_STARTCODE1);
+	usart_putchar(USART_NFC, (uint8_t) PN532_STARTCODE2);
 	
 	uint8_t length = hlen + blen + 1;   // length of data field: TFI + DATA
-	usart_putchar(USART0, (uint8_t) length);
-	usart_putchar(USART0, (uint8_t) ~length + 1);         // checksum of length
+	usart_putchar(USART_NFC, (uint8_t) length);
+	usart_putchar(USART_NFC, (uint8_t) ~length + 1);         // checksum of length
 	
-	usart_putchar(USART0, (uint8_t) PN532_HOSTTOPN532);
+	usart_putchar(USART_NFC, (uint8_t) PN532_HOSTTOPN532);
 	uint8_t sum = PN532_HOSTTOPN532;    // sum of TFI + DATA
 
-	usart_serial_write_packet(USART0, header, hlen);
+	usart_serial_write_packet(USART_NFC, header, hlen);
 	
 	for (uint8_t i = 0; i < hlen; i++) {
 		sum += header[i];
 		//DMSG_HEX(header[i]);
 	}
 
-	usart_serial_write_packet(USART0, body, blen);
+	usart_serial_write_packet(USART_NFC, body, blen);
 	for (uint8_t i = 0; i < blen; i++) {
 		sum += body[i];
 		//DMSG_HEX(body[i]);
 	}
 
 	uint8_t checksum = ~sum + 1;            // checksum of TFI + DATA
-	usart_putchar(USART0, checksum);
-	usart_putchar(USART0, (uint8_t) PN532_POSTAMBLE);
+	usart_putchar(USART_NFC, checksum);
+	usart_putchar(USART_NFC, (uint8_t) PN532_POSTAMBLE);
 
 	printf("\nWrite: ");
 	for (uint8_t i = 0; i < hlen; i++) {
